@@ -16,16 +16,20 @@ namespace Student_Grade_Manager
             string fileReportsFolder = "reports/";
             string errorMessage = "";
             string errorLine = "";
-            string locationBlock = "";
             bool programLoop = true;
             string[] fileLinesOfErrorLog = new string[0];
             string[] fileLinesOfStudentGrades = new string[0];
+            
 
             while (programLoop)
             {
+                string blockLocation = "";
+                int sequencePart = 0;
+                int userMenuChoice = 0;
                 try
                 {
-                    locationBlock = "R";
+
+                    blockLocation = "R";
                     if (File.Exists(fileErrorLog))
                     {
                         fileLinesOfErrorLog = File.ReadAllLines(fileErrorLog);
@@ -38,8 +42,7 @@ namespace Student_Grade_Manager
                     else
                         File.AppendAllText(fileStudentGrades, "StudentID,LastName,FirstName,DataStructuresGrade,Programming2Grade,MathApplicationITGrade\n");
 
-                    locationBlock = "M";
-
+                    blockLocation = "M";
                     Console.WriteLine("- - - Students Grade Manager - - -");
                     List<string> menuOptions = new List<string>
                     { "Add New Student Record",
@@ -48,6 +51,7 @@ namespace Student_Grade_Manager
                       "Check and Export Student Record",
                       "View Error Logs",
                       "Exit" };
+
                     for (int i = 0; i < menuOptions.Count; i++)
                         Console.WriteLine($"{i + 1}. {menuOptions[i]}");
                     Console.Write("\nEnter the number of your desired option: ");
@@ -56,7 +60,7 @@ namespace Student_Grade_Manager
                     if (inputMenu == "")
                         throw new ArgumentException();
 
-                    int userMenuChoice = int.Parse(inputMenu);
+                    userMenuChoice = int.Parse(inputMenu);
                     if (userMenuChoice > menuOptions.Count || userMenuChoice < 1)
                         throw new IndexOutOfRangeException();
 
@@ -65,13 +69,11 @@ namespace Student_Grade_Manager
                     switch (userMenuChoice)
                     {
                         case 1:
-                            locationBlock = "M-C1-S1-I1";
                             Console.Write("\nSTUDENT ID: ");
                             string studentID = Console.ReadLine().ToUpper();
                             if (studentID == "")
                                 throw new ArgumentException();
 
-                            locationBlock = "M-C1-S2-P1";
                             foreach (string line in fileLinesOfStudentGrades)
                             {
                                 if (line.Contains(studentID))
@@ -83,20 +85,19 @@ namespace Student_Grade_Manager
 
                             if (idFound)
                             {
+                                blockLocation += $"-C{Convert.ToString(userMenuChoice)}-S{Convert.ToString(sequencePart)}";
                                 errorMessage = "Input is a non-unique ID.";
-                                errorLine = $"({DateTime.Now}) Duplicate ID Error ({locationBlock}) - {errorMessage}";
+                                errorLine = $"({DateTime.Now}) Duplicate ID Error ({blockLocation}) - {errorMessage}";
                                 File.AppendAllText(fileErrorLog, $"{errorLine}\n");
                                 Console.WriteLine($"\n{errorMessage}");
                                 break;
                             }
 
-                            locationBlock = "M-C1-S3-I1";
                             Console.Write("\nLAST NAME: ");
                             string studentLastName = Console.ReadLine().ToUpper();
                             if (studentLastName == "")
                                 throw new ArgumentException();
 
-                            locationBlock = "M-1I3";
                             Console.Write("\nFIRST NAME: ");
                             string studentFirstName = Console.ReadLine().ToUpper();
                             if (studentFirstName == "")
@@ -104,19 +105,16 @@ namespace Student_Grade_Manager
 
                             string gradeOverflow = "Grades cannot be greater than 100 or less than 0.";
 
-                            locationBlock = "M-1I4";
                             Console.Write("\nDATA STRUCTURES GRADE: ");
                             int gradeDataStructures = int.Parse(Console.ReadLine());
                             if (gradeDataStructures > 100 || gradeDataStructures < 0)
                                 throw new OverflowException(gradeOverflow);
 
-                            locationBlock = "M-1I5";
                             Console.Write("\nPROGRAMMING 2 GRADE: ");
                             int gradeProgramming2 = int.Parse(Console.ReadLine());
                             if (gradeProgramming2 > 100 || gradeProgramming2 < 0)
                                 throw new OverflowException(gradeOverflow);
 
-                            locationBlock = "M-1I6";
                             Console.Write("\nMATH APPLICATION IT GRADE: ");
                             int gradeMathApplicationIT = int.Parse(Console.ReadLine());
                             if (gradeMathApplicationIT > 100 || gradeMathApplicationIT < 0)
@@ -135,7 +133,6 @@ namespace Student_Grade_Manager
                                           "(4) Select \"Copy as path\"\n" +
                                           "\nFile Path: ");
 
-                            locationBlock = "M-2I1";
                             string rawFilePath = Console.ReadLine();
                             string filePath = rawFilePath.Substring(1, rawFilePath.Length - 2);
                             if (rawFilePath == "")
@@ -164,8 +161,9 @@ namespace Student_Grade_Manager
 
                             if (idFound)
                             {
+                                blockLocation += $"-C{Convert.ToString(userMenuChoice)}-S{Convert.ToString(sequencePart)}";
                                 errorMessage = "File contains non-unique ID/s.";
-                                errorLine = $"({DateTime.Now}) Duplicate ID Error ({locationBlock}) - {errorMessage}";
+                                errorLine = $"({DateTime.Now}) Duplicate ID Error ({blockLocation}) - {errorMessage}";
                                 File.AppendAllText(fileErrorLog, $"{errorLine}\n");
                                 Console.WriteLine($"\n{errorMessage}");
                                 break;
@@ -194,8 +192,6 @@ namespace Student_Grade_Manager
                             break;
 
                         case 3:
-                            locationBlock = "M-3";
-
                             foreach (string line in fileLinesOfStudentGrades)
                                 Console.WriteLine(line);
 
@@ -203,11 +199,9 @@ namespace Student_Grade_Manager
 
                             break;
                         case 4:
-                            locationBlock = "M-4";
 
                             break;
                         case 5:
-                            locationBlock = "M-5";
 
                             break;
                         case 6:
@@ -218,50 +212,58 @@ namespace Student_Grade_Manager
                 }
                 catch (ArgumentException)
                 {
+                    blockLocation += $"-C{Convert.ToString(userMenuChoice)}-S{Convert.ToString(sequencePart)}";
                     errorMessage = "Input cannot be empty.";
-                    errorLine = $"({DateTime.Now}) Empty Error ({locationBlock}) - {errorMessage}";
+                    errorLine = $"({DateTime.Now}) Empty Error ({blockLocation}) - {errorMessage}";
                     File.AppendAllText(fileErrorLog, $"{errorLine}\n");
                     Console.WriteLine($"\n{errorMessage}");
                 }
                 catch (FormatException e)
                 {
-                    errorLine = $"({DateTime.Now}) Format Error ({locationBlock}) - {e.Message}";
+                    blockLocation += $"-C{Convert.ToString(userMenuChoice)}-S{Convert.ToString(sequencePart)}";
+                    errorLine = $"({DateTime.Now}) Format Error ({blockLocation}) - {e.Message}";
                     File.AppendAllText(fileErrorLog, $"{errorLine}\n");
                     Console.WriteLine($"\n{e.Message}");
                 }
                 catch (OverflowException e)
                 {
-                    errorLine = $"({DateTime.Now}) Overflow Error ({locationBlock}) - {e.Message}";
+                    blockLocation += $"-C{Convert.ToString(userMenuChoice)}-S{Convert.ToString(sequencePart)}";
+                    errorLine = $"({DateTime.Now}) Overflow Error ({blockLocation}) - {e.Message}";
                     File.AppendAllText(fileErrorLog, $"{errorLine}\n");
                     Console.WriteLine($"\n{e.Message}");
                 }
                 catch (IndexOutOfRangeException e)
                 {
-                    errorLine = $"({DateTime.Now}) Index Out Of Range Error ({locationBlock}) - {e.Message}";
+                    blockLocation += $"-C{Convert.ToString(userMenuChoice)}-S{Convert.ToString(sequencePart)}";
+                    errorLine = $"({DateTime.Now}) Index Out Of Range Error ({blockLocation}) - {e.Message}";
                     File.AppendAllText(fileErrorLog, $"{errorLine}\n");
                     Console.WriteLine($"\n{e.Message}");
                 }
                 catch (FileNotFoundException e)
                 {
-                    errorLine = $"({DateTime.Now}) File Not Found Error ({locationBlock}) - {e.Message}";
+                    blockLocation += $"-C{Convert.ToString(userMenuChoice)}-S{Convert.ToString(sequencePart)}";
+                    errorLine = $"({DateTime.Now}) File Not Found Error ({blockLocation}) - {e.Message}";
                     File.AppendAllText(fileErrorLog, $"{errorLine}\n");
                     Console.WriteLine($"\n{e.Message}");
                 }
                 catch (IOException e)
                 {
-                    errorLine = $"({DateTime.Now}) Input/Output Error ({locationBlock}) - {e.Message}";
+                    blockLocation += $"-C{Convert.ToString(userMenuChoice)}-S{Convert.ToString(sequencePart)}";
+                    errorLine = $"({DateTime.Now}) Input/Output Error ({blockLocation}) - {e.Message}";
                     File.AppendAllText(fileErrorLog, $"{errorLine}\n");
                     Console.WriteLine($"\n{e.Message}");
                 }
                 catch (UnauthorizedAccessException e)
                 {
-                    errorLine = $"({DateTime.Now}) Unauthorized Access Error ({locationBlock}) - {e.Message}";
+                    blockLocation += $"-C{Convert.ToString(userMenuChoice)}-S{Convert.ToString(sequencePart)}";
+                    errorLine = $"({DateTime.Now}) Unauthorized Access Error ({blockLocation}) - {e.Message}";
                     File.AppendAllText(fileErrorLog, $"{errorLine}\n");
                     Console.WriteLine($"\n{e.Message}");
                 }
                 catch (Exception e)
                 {
-                    errorLine = $"({DateTime.Now}) Unknown Error ({locationBlock}) - {e.Message}";
+                    blockLocation += $"-C{Convert.ToString(userMenuChoice)}-S{Convert.ToString(sequencePart)}";
+                    errorLine = $"({DateTime.Now}) Unknown Error ({blockLocation}) - {e.Message}";
                     File.AppendAllText(fileErrorLog, $"{errorLine}\n");
                     Console.WriteLine($"\n{e.Message}");
                 }
