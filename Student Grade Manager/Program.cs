@@ -32,6 +32,7 @@ namespace Student_Grade_Manager
                 try
                 {
                     blockLocation = "R";
+
                     sequencePart++;
                     if (!Directory.Exists(fileStudentGradesFolder))
                         Directory.CreateDirectory(fileStudentGradesFolder);
@@ -40,17 +41,14 @@ namespace Student_Grade_Manager
 
                     sequencePart++;
                     if (File.Exists(fileErrorLog))
-                    {
                         fileLinesOfErrorLog = File.ReadAllLines(fileErrorLog);
-                    }
                     if (File.Exists(fileStudentGrades))
-                    {
                         fileLinesOfStudentGrades = File.ReadAllLines(fileStudentGrades);
-                    }
                     else
                         File.AppendAllText(fileStudentGrades, "StudentID,LastName,FirstName,DataStructuresGrade,Programming2Grade,MathApplicationITGrade\n");
 
                     blockLocation = "M";
+                    sequencePart++;
                     Console.WriteLine("- - - Students Grade Manager - - -");
                     List<string> menuOptions = new List<string>
                     { "Add New Student Record",
@@ -59,12 +57,9 @@ namespace Student_Grade_Manager
                       "Check and Export Student Record",
                       "View Error Logs",
                       "Exit" };
-
-                    sequencePart++;
                     for (int i = 0; i < menuOptions.Count; i++)
                         Console.WriteLine($"{i + 1}. {menuOptions[i]}");
                     Console.Write("\nEnter the number of your desired option: ");
-
                     string inputMenu = Console.ReadLine();
                     if (inputMenu == "")
                         throw new ArgumentException();
@@ -161,65 +156,56 @@ namespace Student_Grade_Manager
                                 throw new ArgumentException();
 
                             sequencePart++;
-                            if (rawFilePath[0] == '\"' && rawFilePath[rawFilePath.Length - 1] == '\"')
-                            {
+                            if (rawFilePath.Contains(".csv") && rawFilePath[0] == '\"' && rawFilePath[rawFilePath.Length - 1] == '\"')
                                 filePath = rawFilePath.Substring(1, rawFilePath.Length - 2);
-                            }
+                            else
+                                throw new FormatException();
 
                             string[] filePathLines = File.ReadAllLines(filePath);
                             List<string[]> filePathLinesSplit = new List<string[]>();
-                            List<string> filePathLinesUnsplit = new List<string>();
+                            List<string[]> fileStudentGradesSplit = new List<string[]>();
+
+                            sequencePart++;
+                            foreach (string line in fileLinesOfStudentGrades)
+                                fileStudentGradesSplit.Add(line.Split(','));
 
                             sequencePart++;
                             foreach (string line in filePathLines)
                                 filePathLinesSplit.Add(line.Split(','));
 
                             sequencePart++;
-                            foreach (string[] splittedLine in filePathLinesSplit)
+                            foreach (string[] line2 in filePathLinesSplit)
                             {
-                                foreach (string line in fileLinesOfStudentGrades)
+                                idFound = false;
+                                string addLine = "";
+
+                                sequencePart++;
+                                foreach (string[] line1 in fileStudentGradesSplit)
                                 {
-                                    if (line.Contains(splittedLine[0].ToUpper()))
+                                    if (line1[0].ToUpper() == line2[0].ToUpper())
                                     {
+                                        Console.WriteLine($"ID ({line2[0]}) is non-unique");
                                         idFound = true;
                                         break;
                                     }
                                 }
                                 if (idFound)
-                                    break;
-                            }
+                                    continue;
 
-                            if (idFound)
-                            {
-                                blockLocation += $"-C{Convert.ToString(casePart)}-S{Convert.ToString(sequencePart)}";
-                                errorMessage = "File contains non-unique ID/s.";
-                                errorLine = $"({DateTime.Now}) Duplicate ID Error ({blockLocation}) - {errorMessage}";
-                                File.AppendAllText(fileErrorLog, $"{errorLine}\n");
-                                Console.WriteLine($"\n{errorMessage}");
-                                break;
-                            }
-
-                            sequencePart++;
-                            foreach (string[] line in filePathLinesSplit)
-                            {
-                                string addLine = "";
-                                for (int i = 0; i < line.Length; i++)
+                                sequencePart++;
+                                for (int i = 0; i < line2.Length; i++)
                                 {
                                     if (i < 3)
-                                        addLine += line[i].ToUpper();
+                                        addLine += line2[i].ToUpper();
                                     else
-                                        addLine += line[i];
-                                    if (i < line.Length - 1)
-                                        addLine += ',';
+                                        addLine += line2[i];
+                                    if (i < line2.Length - 1)
+                                        addLine += ",";
                                 }
-                                filePathLinesUnsplit.Add(addLine);
+                                Console.WriteLine($"Successfully added {addLine}");
+                                File.AppendAllText(fileStudentGrades, $"{addLine}\n");
                             }
 
-                            sequencePart++;
-                            Console.WriteLine("Successfully added the following student records:");
-                            foreach (string line in filePathLinesUnsplit)
-                                Console.WriteLine(line);
-                            File.AppendAllLines(fileStudentGrades, filePathLinesUnsplit);
                             break;
 
                         case 3:
@@ -285,8 +271,8 @@ namespace Student_Grade_Manager
                                     string fileExportName = $"{splitLine[1]}, {splitLine[2]}_Grades";
                                     if (File.Exists($"{fileReportsFolder}{fileExportName}.csv"))
                                         File.Delete($"{fileReportsFolder}{fileExportName}.csv");
-                                    File.AppendAllText($"{fileReportsFolder}{fileExportName}.csv", "StudentID,LastName,FirstName,DataStructuresGrade,Programming2Grade,MathApplicationITGrade\n");
-                                    File.AppendAllText($"{fileReportsFolder}{fileExportName}.csv", $"{splitLine[0]},{splitLine[1]},{splitLine[2]},{splitLine[3]},{splitLine[4]},{splitLine[5]}");
+                                    File.AppendAllText($"{fileReportsFolder}{fileExportName}.csv", "StudentID,LastName,FirstName,DataStructuresGrade,Programming2Grade,MathApplicationITGrade,GradeAverage\n");
+                                    File.AppendAllText($"{fileReportsFolder}{fileExportName}.csv", $"{splitLine[0]},{splitLine[1]},{splitLine[2]},{splitLine[3]},{splitLine[4]},{splitLine[5]},{averageGrade}");
                                     Console.WriteLine($"\nSuccessfully exported {fileReportsFolder}{fileExportName}.csv");
                                     break;
                                 }
@@ -294,7 +280,13 @@ namespace Student_Grade_Manager
 
                             sequencePart++;
                             if (!idFound)
-                                Console.WriteLine($"Could not find {searchStudentID.ToUpper()}");
+                            {
+                                blockLocation += $"-C{Convert.ToString(casePart)}-S{Convert.ToString(sequencePart)}";
+                                errorMessage = $"Could not find {searchStudentID.ToUpper()}";
+                                errorLine = $"({DateTime.Now}) Empty Error ({blockLocation}) - {errorMessage}";
+                                File.AppendAllText(fileErrorLog, $"{errorLine}\n");
+                                Console.WriteLine($"\n{errorMessage}");
+                            }
 
                             break;
                         case 5:
