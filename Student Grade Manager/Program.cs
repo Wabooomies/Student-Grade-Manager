@@ -206,7 +206,6 @@ namespace Student_Grade_Manager
                                 Console.WriteLine($"Successfully added {addLine}");
                                 File.AppendAllText(fileStudentGrades, $"{addLine}\n");
                             }
-
                             break;
 
                         case 3:
