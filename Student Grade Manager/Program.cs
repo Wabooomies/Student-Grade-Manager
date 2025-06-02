@@ -48,6 +48,7 @@ namespace Student_Grade_Manager
                         File.AppendAllText(fileStudentGrades, "StudentID,LastName,FirstName,DataStructuresGrade,Programming2Grade,MathApplicationITGrade\n");
 
                     blockLocation = "M";
+
                     sequencePart++;
                     Console.WriteLine("- - - Students Grade Manager - - -");
                     List<string> menuOptions = new List<string>
