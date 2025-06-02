@@ -12,6 +12,8 @@ namespace Student_Grade_Manager
     {
         static void Main(string[] args)
         {
+            string fileStudentGradesFolder = "data/";
+            string fileReportsFolder = "reports/";
             string fileStudentGrades = "data/student_grades.csv";
             string fileErrorLog = "data/errorLog.txt";
             string errorMessage = "";
@@ -19,7 +21,6 @@ namespace Student_Grade_Manager
             bool programLoop = true;
             string[] fileLinesOfErrorLog = new string[0];
             string[] fileLinesOfStudentGrades = new string[0];
-            string fileReportsFolder = "reports/";
 
 
             while (programLoop)
@@ -31,6 +32,12 @@ namespace Student_Grade_Manager
                 try
                 {
                     blockLocation = "R";
+                    sequencePart++;
+                    if (!Directory.Exists(fileStudentGradesFolder))
+                        Directory.CreateDirectory(fileStudentGradesFolder);
+                    if (!Directory.Exists(fileReportsFolder))
+                        Directory.CreateDirectory(fileReportsFolder);
+
                     sequencePart++;
                     if (File.Exists(fileErrorLog))
                     {
@@ -73,6 +80,7 @@ namespace Student_Grade_Manager
                     {
                         case 1:
                             casePart = 1;
+
                             sequencePart++;
                             Console.Write("\nSTUDENT ID: ");
                             string studentID = Console.ReadLine().ToUpper();
@@ -139,6 +147,7 @@ namespace Student_Grade_Manager
 
                         case 2:
                             casePart = 2;
+
                             sequencePart++;
                             Console.Write("\nTo get the file path:\n" +
                                           "(1) - Find your .csv file\n" +
@@ -215,10 +224,10 @@ namespace Student_Grade_Manager
 
                         case 3:
                             casePart = 3;
-                            foreach (string line in fileLinesOfStudentGrades)
-                                Console.WriteLine(line);
 
                             sequencePart++;
+                            foreach (string line in fileLinesOfStudentGrades)
+                                Console.WriteLine(line);
                             Console.Write("\nDo you want to export this file? (Press Y or N): ");
                             string fileExportChoice = Console.ReadLine();
                             if (fileExportChoice == "")
@@ -250,14 +259,18 @@ namespace Student_Grade_Manager
                                 Console.WriteLine($"\n{errorMessage}");
                                 break;
                             }
+
                             break;
                         case 4:
                             casePart = 4;
+
+                            sequencePart++;
                             Console.Write("\nSearch for Student via ID: ");
                             string searchStudentID = Console.ReadLine();
                             if (searchStudentID == "")
                                 throw new ArgumentException();
 
+                            sequencePart++;
                             foreach (string line in fileLinesOfStudentGrades)
                             {
                                 string[] splitLine = line.Split(',');
@@ -279,18 +292,23 @@ namespace Student_Grade_Manager
                                 }
                             }
 
+                            sequencePart++;
                             if (!idFound)
                                 Console.WriteLine($"Could not find {searchStudentID.ToUpper()}");
 
                             break;
                         case 5:
                             casePart = 5;
+
+                            sequencePart++;
                             Console.WriteLine("\nError Log:");
                             foreach (string line in fileLinesOfErrorLog)
                                 Console.WriteLine(line);
                             break;
                         case 6:
                             casePart = 6;
+
+                            sequencePart++;
                             programLoop = false;
                             Console.WriteLine("\nYou have exited the program!");
                             break;
